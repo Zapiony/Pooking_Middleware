@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+option csharp_namespace = "Booking.Middleware.Api.Protos";
+
+package middleware;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EventBusGrpcService — comunicación ASÍNCRONA (fire-and-forget)
+// Los microservicios llaman aquí para notificar operaciones de escritura.
+// El Middleware las rutea a Auditoria.
+// ─────────────────────────────────────────────────────────────────────────────
+service EventBusGrpcService {
+  rpc PublicarEvento       (EventoRequest)       returns (EventoReply);
+  rpc PublicarEventosBatch (EventosBatchRequest) returns (EventosBatchReply);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ResolverGrpcService — comunicación SÍNCRONA (necesito la respuesta)
+// Los microservicios llaman aquí para obtener datos de otro dominio.
+// Evita que los microservicios se llamen entre sí directamente.
+// ─────────────────────────────────────────────────────────────────────────────
+service ResolverGrpcService {
+  rpc ResolverServicio              (ResolverServicioRequest)      returns (ResolverServicioReply);
+  rpc ResolverUsuario               (ResolverUsuarioRequest)       returns (ResolverUsuarioReply);
+  rpc ValidarDisponibilidadServicio (ValidarDisponibilidadRequest) returns (DisponibilidadReply);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enumeraciones
+// ─────────────────────────────────────────────────────────────────────────────
+enum TipoOperacion {
+  INSERT = 0;
+  UPDATE = 1;
+  DELETE = 2;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mensajes — EventBusGrpcService
+// ─────────────────────────────────────────────────────────────────────────────
+
+message EventoRequest {
+  string        id_correlacion   = 1;   // UUID v4 generado por el productor
+  string        tabla_afectada   = 2;
+  string        esquema_afectado = 3;   // siempre 'booking'
+  TipoOperacion operacion        = 4;
+  string        id_registro      = 5;   // GUID del registro afectado
+  string        datos_anteriores = 6;   // JSON (vacío en INSERT)
+  string        datos_nuevos     = 7;   // JSON (vacío en DELETE)
+  string        usuario          = 8;   // username propagado del JWT
+  string        ip               = 9;
+  string        servicio_origen  = 10;
+  string        equipo_origen    = 11;
+}
+
+message EventoReply {
+  bool   success          = 1;
+  string id_correlacion   = 2;
+  int64  id_log_auditoria = 3;
+  string mensaje          = 4;
+}
+
+message EventosBatchRequest {
+  repeated EventoRequest eventos = 1;   // máx. 20
+}
+
+message EventosBatchReply {
+  repeated EventoReply resultados = 1;
+  int32 exitosos = 2;
+  int32 fallidos = 3;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mensajes — ResolverGrpcService
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ResolverServicioRequest {
+  string guid_servicio = 1;
+}
+
+message ResolverServicioReply {
+  bool   found             = 1;
+  string guid_servicio     = 2;
+  string razon_social      = 3;
+  string nombre_comercial  = 4;
+  string tipo_servicio     = 5;
+  string estado            = 6;
+  string correo_contacto   = 7;
+  string telefono_contacto = 8;
+  string logo_url          = 9;
+  string mensaje           = 10;
+}
+
+message ResolverUsuarioRequest {
+  string guid_usuario = 1;
+}
+
+message ResolverUsuarioReply {
+  bool            found        = 1;
+  string          guid_usuario = 2;
+  string          username     = 3;
+  string          correo       = 4;
+  string          estado       = 5;
+  repeated string roles        = 6;
+  string          mensaje      = 7;
+}
+
+message ValidarDisponibilidadRequest {
+  string guid_servicio = 1;
+  string fecha_inicio  = 2;   // ISO 8601
+  string fecha_fin     = 3;   // ISO 8601 (vacío si no aplica)
+}
+
+message DisponibilidadReply {
+  bool   disponible = 1;
+  string motivo     = 2;
+}

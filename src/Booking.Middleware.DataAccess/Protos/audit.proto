@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option csharp_namespace = "Booking.Auditoria.API.Protos";
+
+package auditoria;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Copia exacta del proto de Auditoria (sin modificar).
+// Booking.Middleware actúa como CLIENTE de este servicio.
+// Consumido por: AuditoriaGrpcClient
+// ─────────────────────────────────────────────────────────────────────────────
+service AuditoriaGrpcService {
+  rpc RegistrarEvento  (AuditoriaRequest)      returns (AuditoriaReply);
+  rpc RegistrarEventos (AuditoriaListRequest)  returns (AuditoriaListReply);
+}
+
+message AuditoriaRequest {
+  string id_correlacion   = 1;
+  string tabla_afectada   = 2;
+  string esquema_afectado = 3;
+  int32  operacion        = 4;   // 0=INSERT, 1=UPDATE, 2=DELETE
+  string id_registro      = 5;
+  string datos_anteriores = 6;
+  string datos_nuevos     = 7;
+  string usuario          = 8;
+  string ip               = 9;
+  string servicio_origen  = 10;
+  string equipo_origen    = 11;
+}
+
+message AuditoriaReply {
+  bool   success          = 1;
+  string id_correlacion   = 2;
+  int64  id_log_auditoria = 3;
+  string mensaje          = 4;
+}
+
+message AuditoriaListRequest {
+  repeated AuditoriaRequest eventos = 1;
+}
+
+message AuditoriaListReply {
+  repeated AuditoriaReply resultados = 1;
+  int32 exitosos = 2;
+  int32 fallidos = 3;
+}
