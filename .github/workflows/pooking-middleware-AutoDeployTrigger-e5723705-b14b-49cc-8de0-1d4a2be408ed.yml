@@ -1,8 +1,6 @@
 name: Trigger auto deployment for pooking-middleware
 
-# When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
   push:
     branches: 
       [ main ]
@@ -10,19 +8,18 @@ on:
     - '**'
     - '.github/workflows/pooking-middleware-AutoDeployTrigger-e5723705-b14b-49cc-8de0-1d4a2be408ed.yml'
 
-  # Allow manual trigger 
   workflow_dispatch:      
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions: 
-      id-token: write #This is required for requesting the OIDC JWT Token
-      contents: read #Required when GH token is used to authenticate with private repo
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout to the branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Azure Login
         uses: azure/login@v2
@@ -31,12 +28,10 @@ jobs:
           tenant-id: ${{ secrets.POOKINGMIDDLEWARE_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.POOKINGMIDDLEWARE_AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push container image to registry
+      - name: Build and Deploy to Azure Container Apps
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          containerAppName: 'pooking-middleware'
-          resourceGroup: 'Pooking-Middleware'
+          containerAppName: pooking-middleware
+          resourceGroup: Pooking-Middleware
           targetPort: 8080
-
-
