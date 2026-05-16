@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Booking.Middleware.Api/Booking.Middleware.Api.csproj" />
+    <Project Path="src/Booking.Middleware.Business/Booking.Middleware.Business.csproj" />
+    <Project Path="src/Booking.Middleware.DataManagement/Booking.Middleware.DataManagement.csproj" />
+    <Project Path="src/Booking.Middleware.DataAccess/Booking.Middleware.DataAccess.csproj" />
+  </Folder>
+</Solution>
