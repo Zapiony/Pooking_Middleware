@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "Microservicio.Pooking.Servicio.Api.Protos";
+
+package servicio;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Resuelve el TODO de ReservasService: validar disponibilidad del catálogo.
+// Sólo accesible desde red privada. Sin JWT.
+// Consumido por: Booking.Middleware (como cliente)
+// ─────────────────────────────────────────────────────────────────────────────
+service ServicioGrpc {
+  rpc ObtenerServicioPorGuid  (ObtenerServicioRequest)       returns (ServicioGrpcReply);
+  rpc ValidarDisponibilidad   (ValidarDisponibilidadRequest) returns (DisponibilidadReply);
+  rpc ObtenerServiciosBatch   (ObtenerServiciosBatchRequest) returns (ServiciosBatchReply);
+}
+
+message ObtenerServicioRequest {
+  string guid_servicio = 1;
+}
+
+message ValidarDisponibilidadRequest {
+  string guid_servicio = 1;
+  string fecha_inicio  = 2;   // ISO 8601
+  string fecha_fin     = 3;   // ISO 8601 (vacío si no aplica)
+}
+
+message ObtenerServiciosBatchRequest {
+  repeated string guids_servicio = 1;  // máx. 50
+}
+
+message ServicioGrpcReply {
+  bool   found             = 1;
+  string guid_servicio     = 2;
+  string razon_social      = 3;
+  string nombre_comercial  = 4;
+  string tipo_servicio     = 5;
+  string estado            = 6;   // ACT | INA | SUS
+  string correo_contacto   = 7;
+  string telefono_contacto = 8;
+  string logo_url          = 9;
+}
+
+message DisponibilidadReply {
+  bool   disponible = 1;
+  string motivo     = 2;
+}
+
+message ServiciosBatchReply {
+  repeated ServicioGrpcReply servicios = 1;
+}

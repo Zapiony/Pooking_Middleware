@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Booking.Middleware.Api": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5500",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT":          "Development",
+        "GrpcEndpoints__Auditoria":        "http://localhost:5401",
+        "GrpcEndpoints__Auth":             "http://localhost:5201",
+        "GrpcEndpoints__Servicio":         "http://localhost:5202"
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "Microservicio.Pooking.Auth.Api.Protos";
+
+package auth;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sólo accesible desde red privada. Sin JWT.
+// Consumido por: Booking.Middleware (como cliente)
+// ─────────────────────────────────────────────────────────────────────────────
+service AuthGrpc {
+  rpc ObtenerUsuarioPorGuid (UsuarioGuidRequest)  returns (UsuarioGrpcReply);
+  rpc ValidarUsuarioActivo  (UsuarioGuidRequest)  returns (ValidacionUsuarioReply);
+}
+
+message UsuarioGuidRequest {
+  string guid_usuario = 1;
+}
+
+message UsuarioGrpcReply {
+  string          guid_usuario   = 1;
+  string          username       = 2;
+  string          correo         = 3;
+  string          estado_usuario = 4;
+  bool            activo         = 5;
+  repeated string roles          = 6;
+}
+
+message ValidacionUsuarioReply {
+  bool   es_valido = 1;
+  string mensaje   = 2;
+}
