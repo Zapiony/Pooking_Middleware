@@ -1,0 +1,14 @@
+# Ignorar carpetas de compilación local
+**/bin/
+**/obj/
+
+# Ignorar control de versiones e IDEs
+.git/
+.github/
+.vs/
+.vscode/
+*.user
+
+# Ignorar archivos de Docker
+Dockerfile
+.dockerignore
