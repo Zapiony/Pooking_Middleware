@@ -2,6 +2,7 @@ using Booking.Auditoria.API.Protos;
 using Booking.Middleware.Business.Interfaces;
 using Booking.Middleware.DataAccess.GrpcClients;
 using Microservicio.Pooking.Auth.Api.Protos;
+using Microservicio.Pooking.Cliente.Api.Protos;
 using Microservicio.Pooking.Servicio.Api.Protos;
 
 namespace Booking.Middleware.Api.Extensions;
@@ -45,6 +46,16 @@ public static class GrpcClientsExtensions
             o.Address = new Uri(servicioEndpoint);
         });
         services.AddScoped<IServicioGrpcClient, ServicioGrpcClient>();
+
+        // ── Cliente gRPC Client ───────────────────────────────────────────────
+        var clienteEndpoint = configuration["GrpcEndpoints:Cliente"]
+            ?? throw new InvalidOperationException("Falta GrpcEndpoints:Cliente en configuración.");
+
+        services.AddGrpcClient<ClienteGrpc.ClienteGrpcClient>(o =>
+        {
+            o.Address = new Uri(clienteEndpoint);
+        });
+        services.AddScoped<IClienteGrpcClient, ClienteGrpcClient>();
 
         return services;
     }

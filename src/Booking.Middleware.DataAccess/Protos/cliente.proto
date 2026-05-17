@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option csharp_namespace = "Microservicio.Pooking.Cliente.Api.Protos";
+
+package cliente;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Expuesto por: Microservicio.Pooking.Cliente (servidor gRPC)
+// Consumido por: Booking.Middleware (como cliente)
+// Solo accesible desde red privada. Sin JWT.
+// ─────────────────────────────────────────────────────────────────────────────
+service ClienteGrpc {
+  rpc ObtenerClientePorGuid  (ObtenerClienteRequest)       returns (ClienteGrpcReply);
+  rpc ObtenerClientesBatch   (ObtenerClientesBatchRequest) returns (ClientesBatchReply);
+}
+
+message ObtenerClienteRequest {
+  string guid_cliente = 1;
+}
+
+message ObtenerClientesBatchRequest {
+  repeated string guids_cliente = 1;  // máx. 50
+}
+
+message ClienteGrpcReply {
+  bool   found           = 1;
+  string guid_cliente    = 2;
+  string nombre          = 3;
+  string apellido        = 4;
+  string correo          = 5;
+  string telefono        = 6;
+  string estado          = 7;   // ACT | INA | SUS
+  string mensaje         = 8;
+}
+
+message ClientesBatchReply {
+  repeated ClienteGrpcReply clientes = 1;
+}

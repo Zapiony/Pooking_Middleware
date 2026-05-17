@@ -9,6 +9,7 @@
         "ASPNETCORE_ENVIRONMENT":          "Development",
         "GrpcEndpoints__Auditoria":        "http://localhost:5401",
         "GrpcEndpoints__Auth":             "http://localhost:5201",
+        "GrpcEndpoints__Cliente":          "http://localhost:5203",
         "GrpcEndpoints__Servicio":         "http://localhost:5202"
       }
     }
