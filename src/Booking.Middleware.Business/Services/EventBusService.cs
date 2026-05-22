@@ -12,14 +12,14 @@ namespace Booking.Middleware.Business.Services;
 /// </summary>
 public sealed class EventBusService : IEventBusService
 {
-    private readonly IAuditoriaGrpcClient _auditoriaClient;
+    private readonly IAuditoriaRepository _auditoriaRepo;
     private readonly ILogger<EventBusService> _logger;
 
     public EventBusService(
-        IAuditoriaGrpcClient auditoriaClient,
+        IAuditoriaRepository auditoriaRepo,
         ILogger<EventBusService> logger)
     {
-        _auditoriaClient = auditoriaClient;
+        _auditoriaRepo = auditoriaRepo;
         _logger = logger;
     }
 
@@ -36,8 +36,7 @@ public sealed class EventBusService : IEventBusService
             _logger.LogInformation(
                 "Publicando evento [{Operacion}] en tabla [{Tabla}] con correlación [{IdCorr}]",
                 evento.Operacion, evento.TablaAfectada, evento.IdCorrelacion);
-
-            var resultado = await _auditoriaClient.RegistrarEventoAsync(evento, ct);
+            var resultado = await _auditoriaRepo.RegistrarEventoAsync(evento, ct);
 
             if (resultado.Success)
             {
@@ -85,8 +84,7 @@ public sealed class EventBusService : IEventBusService
             _logger.LogInformation(
                 "Publicando lote de {Count} eventos hacia Auditoria",
                 lista.Count);
-
-            var resultado = await _auditoriaClient.RegistrarEventosAsync(lista, ct);
+            var resultado = await _auditoriaRepo.RegistrarEventosAsync(lista, ct);
 
             _logger.LogInformation(
                 "Lote procesado. Exitosos={Exitosos}, Fallidos={Fallidos}",

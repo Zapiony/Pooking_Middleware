@@ -7,7 +7,7 @@ namespace Booking.Middleware.DataManagement.Repositories;
 /// Repositorio sobre el cliente gRPC de Auth.
 /// Permite agregar caché de resolución de usuarios sin afectar capas superiores.
 /// </summary>
-public sealed class AuthRepository
+public sealed class AuthRepository : IAuthRepository
 {
     private readonly IAuthGrpcClient _client;
 

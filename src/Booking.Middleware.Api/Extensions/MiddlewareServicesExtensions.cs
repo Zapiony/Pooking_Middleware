@@ -13,9 +13,10 @@ public static class MiddlewareServicesExtensions
     public static IServiceCollection AddMiddlewareServices(this IServiceCollection services)
     {
         // ── DataManagement — repositorios ─────────────────────────────────────
-        services.AddScoped<AuditoriaRepository>();
-        services.AddScoped<AuthRepository>();
-        services.AddScoped<ServicioRepository>();
+        services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IServicioRepository, ServicioRepository>();
+        services.AddScoped<IClienteRepository, ClienteRepository>();
 
         // ── Business — servicios ──────────────────────────────────────────────
         services.AddScoped<IEventBusService, EventBusService>();
