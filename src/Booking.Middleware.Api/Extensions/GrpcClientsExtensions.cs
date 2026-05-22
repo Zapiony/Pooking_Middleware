@@ -18,14 +18,21 @@ public static class GrpcClientsExtensions
         IConfiguration configuration)
     {
         // ── Auditoria gRPC Client ─────────────────────────────────────────────
-        var auditoriaEndpoint = configuration["GrpcEndpoints:Auditoria"]
-            ?? throw new InvalidOperationException("Falta GrpcEndpoints:Auditoria en configuración.");
+        var auditoriaEndpoint = configuration["GrpcEndpoints:Auditoria"];
+        var auditoriaEnabled = !string.IsNullOrWhiteSpace(auditoriaEndpoint) && auditoriaEndpoint != "disabled";
 
-        services.AddGrpcClient<AuditoriaGrpcService.AuditoriaGrpcServiceClient>(o =>
+        if (auditoriaEnabled)
         {
-            o.Address = new Uri(auditoriaEndpoint);
-        });
-        services.AddScoped<IAuditoriaGrpcClient, AuditoriaGrpcClient>();
+            services.AddGrpcClient<AuditoriaGrpcService.AuditoriaGrpcServiceClient>(o =>
+            {
+                o.Address = new Uri(auditoriaEndpoint!);
+            });
+            services.AddScoped<IAuditoriaGrpcClient, AuditoriaGrpcClient>();
+        }
+        else
+        {
+            services.AddScoped<IAuditoriaGrpcClient, AuditoriaGrpcClientDisabled>();
+        }
 
         // ── Auth gRPC Client ──────────────────────────────────────────────────
         var authEndpoint = configuration["GrpcEndpoints:Auth"]
@@ -60,3 +67,39 @@ public static class GrpcClientsExtensions
         return services;
     }
 }
+
+/// <summary>
+/// Implementación mock/No-op para cuando el servicio de Auditoria está deshabilitado en desarrollo local.
+/// Evita errores en cascada y excepciones no controladas cuando los servicios envían eventos de auditoría.
+/// </summary>
+internal sealed class AuditoriaGrpcClientDisabled : IAuditoriaGrpcClient
+{
+    private readonly ILogger<AuditoriaGrpcClientDisabled> _logger;
+
+    public AuditoriaGrpcClientDisabled(ILogger<AuditoriaGrpcClientDisabled> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task<(bool Success, long IdLogAuditoria, string Mensaje)> RegistrarEventoAsync(
+        Booking.Middleware.Business.DTOs.EventoDto evento,
+        CancellationToken ct = default)
+    {
+        _logger.LogInformation(
+            "Auditoria MOCK: RegistrarEvento[{Operacion}] en tabla [{Tabla}] (IdCorrelacion={IdCorr}) exitoso.",
+            evento.Operacion, evento.TablaAfectada, evento.IdCorrelacion);
+        return Task.FromResult((true, 999L, "Auditoría deshabilitada (Mock exitoso)"));
+    }
+
+    public Task<(int Exitosos, int Fallidos)> RegistrarEventosAsync(
+        IEnumerable<Booking.Middleware.Business.DTOs.EventoDto> eventos,
+        CancellationToken ct = default)
+    {
+        var list = eventos.ToList();
+        _logger.LogInformation(
+            "Auditoria MOCK: RegistrarEventos lote de {Count} eventos exitoso.",
+            list.Count);
+        return Task.FromResult((list.Count, 0));
+    }
+}
+

@@ -1,0 +1,133 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Base Vehiculos",
+    "version": "v2"
+  },
+  "paths": {
+    "/api/v2/booking/vehiculos": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Lista de vehiculos disponibles",
+        "parameters": [
+          {"name": "idLocalizacion", "in": "query", "required": true, "schema": {"type": "integer"}},
+          {"name": "fechaRecogida", "in": "query", "required": true, "schema": {"type": "string", "format": "date-time"}},
+          {"name": "fechaDevolucion", "in": "query", "required": true, "schema": {"type": "string", "format": "date-time"}},
+          {"name": "nombreCategoria", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "nombreMarca", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "transmision", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "sort", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/vehiculos/{idVehiculo}": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Detalle de un vehiculo",
+        "parameters": [
+          {"name": "idVehiculo", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/reservas/{idVehiculo}/disponibilidad": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Verificar disponibilidad de un vehiculo",
+        "parameters": [
+          {"name": "idVehiculo", "in": "path", "required": true, "schema": {"type": "integer"}},
+          {"name": "idLocalizacion", "in": "query", "required": true, "schema": {"type": "integer"}},
+          {"name": "fechaRecogida", "in": "query", "required": true, "schema": {"type": "string", "format": "date-time"}},
+          {"name": "fechaDevolucion", "in": "query", "required": true, "schema": {"type": "string", "format": "date-time"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/localizaciones": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Lista de sucursales (localizaciones)",
+        "parameters": [
+          {"name": "idCiudad", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/localizaciones/{idLocalizacion}": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Detalle de una sucursal",
+        "parameters": [
+          {"name": "idLocalizacion", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/categorias": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Lista de categorias de vehiculos",
+        "parameters": [
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/extras": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Lista de extras disponibles",
+        "parameters": [
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/reservas/{codigoReserva}": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Detalle de una reserva por codigo",
+        "parameters": [
+          {"name": "codigoReserva", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/booking/reservas": {
+      "post": {
+        "tags": ["Booking"],
+        "summary": "Crear Reserva",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idVehiculo": {"type": "integer"},
+                  "idLocalizacionRecogida": {"type": "integer"},
+                  "idLocalizacionDevolucion": {"type": "integer"},
+                  "fechaInicio": {"type": "string"},
+                  "fechaFin": {"type": "string"},
+                  "horaInicio": {"type": "string"},
+                  "horaFin": {"type": "string"},
+                  "cliente": {"type": "object"},
+                  "conductores": {"type": "array", "items": {"type": "object"}},
+                  "extras": {"type": "array", "items": {"type": "object"}}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "Exito"}}
+      }
+    }
+  }
+}

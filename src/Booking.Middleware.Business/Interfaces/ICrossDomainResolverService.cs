@@ -25,6 +25,13 @@ public interface ICrossDomainResolverService
         CancellationToken ct = default);
 
     /// <summary>
+    /// Obtiene datos de un cliente por su GUID.
+    /// </summary>
+    Task<ClienteResolucionDto> ResolverClienteAsync(
+        string guidCliente,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// Valida si un servicio está disponible en el rango de fechas dado.
     /// </summary>
     Task<DisponibilidadDto> ValidarDisponibilidadServicioAsync(

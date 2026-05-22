@@ -7,7 +7,7 @@ namespace Booking.Middleware.DataManagement.Repositories;
 /// Repositorio sobre el cliente gRPC de Servicio.
 /// Permite agregar caché corta de catálogo (p.ej. IMemoryCache) sin afectar capas superiores.
 /// </summary>
-public sealed class ServicioRepository
+public sealed class ServicioRepository : IServicioRepository
 {
     private readonly IServicioGrpcClient _client;
 

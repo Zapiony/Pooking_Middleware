@@ -8,7 +8,7 @@ namespace Booking.Middleware.DataManagement.Repositories;
 /// Capa de indirección que permite agregar caché, logging extra o transformaciones
 /// sin modificar el cliente gRPC ni el servicio de negocio.
 /// </summary>
-public sealed class AuditoriaRepository
+public sealed class AuditoriaRepository : IAuditoriaRepository
 {
     private readonly IAuditoriaGrpcClient _client;
 
