@@ -1,0 +1,264 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "martin-route": {
+        "ClusterId": "martin-cluster",
+        "Match": {
+          "Path": "/martin/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/martin" }
+        ]
+      },
+      "dylan-route": {
+        "ClusterId": "dylan-cluster",
+        "Match": {
+          "Path": "/dylan/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/dylan" }
+        ]
+      },
+      "ana-route": {
+        "ClusterId": "ana-cluster",
+        "Match": {
+          "Path": "/ana/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/ana" }
+        ]
+      },
+      "kath-route": {
+        "ClusterId": "kath-cluster",
+        "Match": {
+          "Path": "/kath/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/kath" }
+        ]
+      },
+      "luis-route": {
+        "ClusterId": "luis-cluster",
+        "Match": {
+          "Path": "/luis/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/luis" }
+        ]
+      },
+      "jhonatan-route": {
+        "ClusterId": "jhonatan-cluster",
+        "Match": {
+          "Path": "/jhonatan/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/jhonatan" }
+        ]
+      },
+      "francisco-route": {
+        "ClusterId": "francisco-cluster",
+        "Match": {
+          "Path": "/francisco/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/francisco" }
+        ]
+      },
+      "angel-route": {
+        "ClusterId": "angel-cluster",
+        "Match": {
+          "Path": "/angel/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/angel" }
+        ]
+      },
+      "nacho-route": {
+        "ClusterId": "nacho-cluster",
+        "Match": {
+          "Path": "/nacho/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/nacho" }
+        ]
+      },
+      "mary-route": {
+        "ClusterId": "mary-cluster",
+        "Match": {
+          "Path": "/mary/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/mary" }
+        ]
+      },
+      "marcillo-route": {
+        "ClusterId": "marcillo-cluster",
+        "Match": {
+          "Path": "/marcillo/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/marcillo" }
+        ]
+      },
+      "jorge-route": {
+        "ClusterId": "jorge-cluster",
+        "Match": {
+          "Path": "/jorge/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/jorge" }
+        ]
+      },
+      "jose-route": {
+        "ClusterId": "jose-cluster",
+        "Match": {
+          "Path": "/jose/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/jose" }
+        ]
+      },
+      "kelvin-route": {
+        "ClusterId": "kelvin-cluster",
+        "Match": {
+          "Path": "/kelvin/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/kelvin" }
+        ]
+      },
+      "juan-route": {
+        "ClusterId": "juan-cluster",
+        "Match": {
+          "Path": "/juan/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/juan" }
+        ]
+      },
+      "mateo-route": {
+        "ClusterId": "mateo-cluster",
+        "Match": {
+          "Path": "/mateo/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/mateo" }
+        ]
+      }
+    },
+    "Clusters": {
+      "martin-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://redcar-api.duckdns.org"
+          }
+        }
+      },
+      "dylan-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://europcar-api-v2.onrender.com"
+          }
+        }
+      },
+      "ana-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://busautoslinux-gccvajh2esguhpcw.eastus-01.azurewebsites.net"
+          }
+        }
+      },
+      "kath-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://middleware-rentix-api-b6g7gbdeaffzazb9.chilecentral-01.azurewebsites.net"
+          }
+        }
+      },
+      "luis-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://api-gateway-travel-dreams.onrender.com"
+          }
+        }
+      },
+      "jhonatan-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://api-gateway-tbt8.onrender.com"
+          }
+        }
+      },
+      "francisco-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://atracciones-microservicios-grpc-production.up.railway.app"
+          }
+        }
+      },
+      "angel-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://api-gateway-production-0afd.up.railway.app"
+          }
+        }
+      },
+      "nacho-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://busvuelosapi0517-f7bxa0hjh8f8a2at.brazilsouth-01.azurewebsites.net"
+          }
+        }
+      },
+      "mary-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://middlewaremicroserviciovuelos-bpf7bsgqh8g2cea5.eastus-01.azurewebsites.net"
+          }
+        }
+      },
+      "marcillo-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://app-booking-gateway-prod.azurewebsites.net"
+          }
+        }
+      },
+      "jorge-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://middlewarebusapi-b4dxgnfkfvbwa9ge.brazilsouth-01.azurewebsites.net"
+          }
+        }
+      },
+      "jose-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://middlewarejd-cnbqcdhyccb2d5du.mexicocentral-01.azurewebsites.net"
+          }
+        }
+      },
+      "kelvin-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://ms-gateway.bluecoast-e7499c30.eastus.azurecontainerapps.io"
+          }
+        }
+      },
+      "juan-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://gateway.orangemeadow-18e2d183.eastus2.azurecontainerapps.io"
+          }
+        }
+      },
+      "mateo-cluster": {
+        "Destinations": {
+          "destination1": {
+            "Address": "https://hotellux-gateway.onrender.com"
+          }
+        }
+      }
+    }
+  }
+}

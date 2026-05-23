@@ -1,0 +1,1222 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bus de Integración - Sistema Vuelos",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v1/booking/vuelos/buscar": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "CodigoIataOrigen",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CodigoIataDestino",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IdAeropuertoOrigen",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "IdAeropuertoDestino",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "FechaSalida",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "CantidadPasajeros",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Clase",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/booking/vuelos/{id_vuelo}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id_vuelo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/booking/vuelos/{id_vuelo}/escalas": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id_vuelo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/booking/vuelos/{id_vuelo}/asientos": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id_vuelo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/booking/aeropuertos": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "Nombre",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IdPais",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/booking/vuelos/sesion-redirect": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingSessionRedirectRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingSessionRedirectRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingSessionRedirectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActualizarAeropuertoRequest": {
+        "type": "object",
+        "properties": {
+          "codigoIata": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoIcao": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "idCiudad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPais": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarAsientoRequest": {
+        "type": "object",
+        "properties": {
+          "disponible": {
+            "type": "boolean"
+          },
+          "clase": {
+            "type": "string",
+            "nullable": true
+          },
+          "precioExtra": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarCiudadRequest": {
+        "type": "object",
+        "properties": {
+          "idPais": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoPostal": {
+            "type": "string",
+            "nullable": true
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarClienteRequest": {
+        "type": "object",
+        "properties": {
+          "nombres": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidos": {
+            "type": "string",
+            "nullable": true
+          },
+          "razonSocial": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "idCiudadResidencia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPaisNacionalidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarPaisRequest": {
+        "type": "object",
+        "properties": {
+          "codigoIso2": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoIso3": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "continente": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarPasajeroRequest": {
+        "type": "object",
+        "properties": {
+          "nombrePasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoDocumentoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "numeroDocumentoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaNacimientoPasajero": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "idPaisNacionalidad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "emailContactoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefonoContactoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "generoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiereAsistencia": {
+            "type": "boolean"
+          },
+          "observacionesPasajero": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarUsuarioRequest": {
+        "type": "object",
+        "properties": {
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActualizarVueloRequest": {
+        "type": "object",
+        "properties": {
+          "idAeropuertoOrigen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idAeropuertoDestino": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numeroVuelo": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaHoraSalida": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaHoraLlegada": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "precioBase": {
+            "type": "number",
+            "format": "double"
+          },
+          "capacidadTotal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgregarEquipajeAdminRequest": {
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "pesoKg": {
+            "type": "number",
+            "format": "double"
+          },
+          "descripcionEquipaje": {
+            "type": "string",
+            "nullable": true
+          },
+          "dimensionesCm": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AsignarRolRequest": {
+        "type": "object",
+        "properties": {
+          "idUsuario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRol": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BookingSessionRedirectRequest": {
+        "type": "object",
+        "properties": {
+          "idVuelo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "urlRetorno": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CambiarEstadoBoletoRequest": {
+        "type": "object",
+        "properties": {
+          "estadoBoleto": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CambiarEstadoEquipajeRequest": {
+        "type": "object",
+        "properties": {
+          "estadoEquipaje": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CambiarEstadoReservaRequest": {
+        "type": "object",
+        "properties": {
+          "estadoReserva": {
+            "type": "string",
+            "nullable": true
+          },
+          "motivoCancelacion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CambiarEstadoVueloRequest": {
+        "type": "object",
+        "properties": {
+          "estadoVuelo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CancelarReservaRequest": {
+        "type": "object",
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearAeropuertoRequest": {
+        "type": "object",
+        "properties": {
+          "codigoIata": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoIcao": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "idCiudad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPais": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearAsientoRequest": {
+        "type": "object",
+        "properties": {
+          "numeroAsiento": {
+            "type": "string",
+            "nullable": true
+          },
+          "clase": {
+            "type": "string",
+            "nullable": true
+          },
+          "precioExtra": {
+            "type": "number",
+            "format": "double"
+          },
+          "posicion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearBoletoRequest": {
+        "type": "object",
+        "properties": {
+          "idReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idDetalle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idVuelo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idAsiento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idFactura": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clase": {
+            "type": "string",
+            "nullable": true
+          },
+          "precioVueloBase": {
+            "type": "number",
+            "format": "double"
+          },
+          "precioAsientoExtra": {
+            "type": "number",
+            "format": "double"
+          },
+          "impuestosBoleto": {
+            "type": "number",
+            "format": "double"
+          },
+          "cargoEquipaje": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearCiudadRequest": {
+        "type": "object",
+        "properties": {
+          "idPais": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoPostal": {
+            "type": "string",
+            "nullable": true
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearClienteAdminRequest": {
+        "type": "object",
+        "properties": {
+          "tipoIdentificacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "numeroIdentificacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombres": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidos": {
+            "type": "string",
+            "nullable": true
+          },
+          "razonSocial": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "idCiudadResidencia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPaisNacionalidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearEscalaRequest": {
+        "type": "object",
+        "properties": {
+          "idAeropuerto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orden": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaHoraLlegada": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaHoraSalida": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tipoEscala": {
+            "type": "string",
+            "nullable": true
+          },
+          "terminal": {
+            "type": "string",
+            "nullable": true
+          },
+          "puerta": {
+            "type": "string",
+            "nullable": true
+          },
+          "observaciones": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearFacturaRequest": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "observacionesFactura": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearPaisRequest": {
+        "type": "object",
+        "properties": {
+          "codigoIso2": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigoIso3": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "continente": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearPasajeroRequest": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "nombrePasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoDocumentoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "numeroDocumentoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaNacimientoPasajero": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "idPaisNacionalidad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "emailContactoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefonoContactoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "generoPasajero": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiereAsistencia": {
+            "type": "boolean"
+          },
+          "observacionesPasajero": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearReservaRequest": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idVuelo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contactoEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactoTelefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "observaciones": {
+            "type": "string",
+            "nullable": true
+          },
+          "subtotalReserva": {
+            "type": "number",
+            "format": "double"
+          },
+          "valorIva": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalReserva": {
+            "type": "number",
+            "format": "double"
+          },
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReservaDetalleRequest"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearUsuarioRequest": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearVueloRequest": {
+        "type": "object",
+        "properties": {
+          "idAeropuertoOrigen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idAeropuertoDestino": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numeroVuelo": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaHoraSalida": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaHoraLlegada": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duracionMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "precioBase": {
+            "type": "number",
+            "format": "double"
+          },
+          "capacidadTotal": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagarReservaEquipajeRequest": {
+        "type": "object",
+        "properties": {
+          "idDetalle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipo": {
+            "type": "string",
+            "nullable": true
+          },
+          "pesoKg": {
+            "type": "number",
+            "format": "double"
+          },
+          "descripcionEquipaje": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagarReservaRequest": {
+        "type": "object",
+        "properties": {
+          "cargoServicio": {
+            "type": "number",
+            "format": "double"
+          },
+          "equipaje": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagarReservaEquipajeRequest"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisterClienteRequest": {
+        "type": "object",
+        "properties": {
+          "tipoIdentificacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "numeroIdentificacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombres": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidos": {
+            "type": "string",
+            "nullable": true
+          },
+          "razonSocial": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "idCiudadResidencia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPaisNacionalidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "genero": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReservaDetalleRequest": {
+        "type": "object",
+        "properties": {
+          "idPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idAsiento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subtotalLinea": {
+            "type": "number",
+            "format": "double"
+          },
+          "valorIvaLinea": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalLinea": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WeatherForecast": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "temperatureC": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "temperatureF": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "JWT emitido por MS Seguridad.",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}
