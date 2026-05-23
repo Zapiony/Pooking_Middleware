@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="yarp.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Booking.Middleware.Business\Booking.Middleware.Business.csproj" />
     <ProjectReference Include="..\Booking.Middleware.DataManagement\Booking.Middleware.DataManagement.csproj" />
     <ProjectReference Include="..\Booking.Middleware.DataAccess\Booking.Middleware.DataAccess.csproj" />

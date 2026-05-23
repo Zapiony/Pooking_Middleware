@@ -1,0 +1,149 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Base Atracciones",
+    "version": "v2"
+  },
+  "paths": {
+    "/api/v2/atracciones": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Lista todas las atracciones disponibles",
+        "parameters": [
+          {"name": "ciudad", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "tipo", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "subtipo", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "idioma", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "etiqueta", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "calificacion_min", "in": "query", "required": false, "schema": {"type": "number"}},
+          {"name": "hora_inicio", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "disponible", "in": "query", "required": false, "schema": {"type": "boolean"}},
+          {"name": "ordenar_por", "in": "query", "required": false, "schema": {"type": "string"}},
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/atracciones/filtros": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Retorna opciones de filtro disponibles",
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/atracciones/{guid}": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Informacion completa de una atraccion",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "responses": {"200": {"description": "Exito"}, "404": {"description": "No encontrado"}}
+      }
+    },
+    "/api/v2/atracciones/{guid}/tickets": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Retorna tipos de ticket disponibles",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/atracciones/{guid}/horarios": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Retorna horarios disponibles",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+          {"name": "fecha", "in": "query", "required": false, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/atracciones/{guid}/horarios/{horarioGuid}/tickets": {
+      "get": {
+        "tags": ["Atracciones"],
+        "summary": "Retorna tickets para un horario",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+          {"name": "horarioGuid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/reservas": {
+      "post": {
+        "tags": ["Reservas"],
+        "summary": "Crear reserva",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "at_guid": {"type": "string"},
+                  "hor_guid": {"type": "string"},
+                  "fecha_visita": {"type": "string"},
+                  "lineas": {"type": "array", "items": {"type": "object"}},
+                  "origen_canal": {"type": "string"},
+                  "cliente_invitado": {"type": "object"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"201": {"description": "Creado"}, "400": {"description": "Parametro invalido"}}
+      },
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Lista todas las reservas",
+        "parameters": [
+          {"name": "page", "in": "query", "required": false, "schema": {"type": "integer"}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+        ],
+        "responses": {"200": {"description": "Exito"}}
+      }
+    },
+    "/api/v2/reservas/{guid}": {
+      "get": {
+        "tags": ["Reservas"],
+        "summary": "Detalle completo de una reserva",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "responses": {"200": {"description": "Exito"}, "404": {"description": "No encontrado"}}
+      }
+    },
+    "/api/v2/reservas/{guid}/pagos/confirmacion": {
+      "post": {
+        "tags": ["Reservas"],
+        "summary": "Confirmar pago",
+        "parameters": [
+          {"name": "guid", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_receptor": {"type": "string"},
+                  "apellido_receptor": {"type": "string"},
+                  "correo_receptor": {"type": "string"},
+                  "telefono_receptor": {"type": "string"},
+                  "observacion": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"201": {"description": "Exito"}, "400": {"description": "Parametro invalido"}}
+      }
+    }
+  }
+}
