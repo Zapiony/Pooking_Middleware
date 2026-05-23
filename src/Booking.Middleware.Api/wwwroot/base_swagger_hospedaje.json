@@ -8,65 +8,31 @@
     "/api/v1/accommodations/search": {
       "get": {
         "tags": ["Hospedaje"],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     },
     "/api/v1/accommodations/{sucursalGuid}": {
       "get": {
         "tags": ["Hospedaje"],
-        "parameters": [
-          {
-            "name": "sucursalGuid",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     },
     "/api/v1/accommodations/{sucursalGuid}/reviews": {
       "get": {
         "tags": ["Hospedaje"],
-        "parameters": [
-          {
-            "name": "sucursalGuid",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     },
     "/api/v1/accommodations/reservas": {
       "post": {
         "tags": ["Hospedaje Reservas"],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     },
     "/api/v1/accommodations/reservas/{reservaGuid}": {
       "get": {
         "tags": ["Hospedaje Reservas"],
-        "parameters": [
-          {
-            "name": "reservaGuid",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     }
   }
