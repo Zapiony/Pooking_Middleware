@@ -47,7 +47,7 @@ public class BookingController : ControllerBase
         // ── 1. Registrar el usuario en el microservicio de Auth ──
         var authRequest = new
         {
-            identificador = request.Identificador,
+            username = request.Identificador,
             correo = request.Correo,
             password = request.Password,
             nombreRol = string.IsNullOrWhiteSpace(request.NombreRol) ? "CLIENTE" : request.NombreRol,
@@ -197,10 +197,10 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
-    [HttpGet("clientes/disponibilidad/correo/{correo}")]
-    public async Task<IActionResult> ProxyClientesDisponibilidadCorreo(string correo)
+    [HttpGet("usuarios/disponibilidad-correo/{correo}")]
+    public async Task<IActionResult> ProxyUsuariosDisponibilidadCorreo(string correo)
     {
-        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/disponibilidad/correo/{correo}";
+        var targetUrl = $"{_authBaseUrl}/api/v1/usuarios/disponibilidad-correo/{correo}";
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
