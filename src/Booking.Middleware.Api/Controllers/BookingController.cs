@@ -183,6 +183,27 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
+    [HttpGet("usuarios/disponibilidad/{username}")]
+    public async Task<IActionResult> ProxyUsuariosDisponibilidad(string username)
+    {
+        var targetUrl = $"{_authBaseUrl}/api/v1/usuarios/disponibilidad/{username}";
+        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
+    }
+
+    [HttpGet("clientes/disponibilidad/{tipo}/{numero_identificacion}")]
+    public async Task<IActionResult> ProxyClientesDisponibilidad(string tipo, string numero_identificacion)
+    {
+        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/disponibilidad/{tipo}/{numero_identificacion}";
+        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
+    }
+
+    [HttpGet("clientes/disponibilidad/correo/{correo}")]
+    public async Task<IActionResult> ProxyClientesDisponibilidadCorreo(string correo)
+    {
+        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/disponibilidad/correo/{correo}";
+        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
+    }
+
 
     [Route("{*path}")]
     [ApiExplorerSettings(IgnoreApi = true)]
