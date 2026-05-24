@@ -158,6 +158,14 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Post, request);
     }
 
+    [HttpPost("clientes/reservas")]
+    public async Task<IActionResult> ProxyCrearReserva([FromBody] CrearReservaRequest request)
+    {
+        _logger.LogInformation("Gateway: Procesando creaciÃ³n de Reserva en Cliente Service.");
+        var targetUrl = $"{_clienteBaseUrl}/api/v2/reservas";
+        return await ForwardRequest(targetUrl, HttpMethod.Post, request);
+    }
+
     [HttpPost("servicios/buscar")]
     public async Task<IActionResult> ProxyServiciosBuscar([FromBody] BusquedaRequest request)
     {

@@ -416,3 +416,22 @@ appsettings.json
 # Secrets and localized settings
 .idea/
 *.sln.iml
+
+# ── Pooking Custom Rules ──────────────────────────────────────────────────────
+
+# Environment specific settings
+appsettings.Development.json
+appsettings.Production.json
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# IDE / AI tooling
+.idea/
+.claude/
+.codex/
+
+# IntelliJ Rider
+*.sln.iml
