@@ -162,7 +162,7 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> ProxyCrearReserva([FromBody] CrearReservaRequest request)
     {
         _logger.LogInformation("Gateway: Procesando creaciÃ³n de Reserva en Cliente Service.");
-        var targetUrl = $"{_clienteBaseUrl}/api/v2/reservas";
+        var targetUrl = $"{_clienteBaseUrl}/api/v1/reservas";
         return await ForwardRequest(targetUrl, HttpMethod.Post, request);
     }
 
