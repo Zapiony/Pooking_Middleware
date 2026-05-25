@@ -593,17 +593,20 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Post, request);
     }
 
-    [HttpGet("clientes/usuario/{guid}")]
-    public async Task<IActionResult> ProxyClienteUsuarioGuid(string guid)
-    {
-        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/usuario/{guid}";
-        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
-    }
-
     [HttpGet("clientes/usuario-guid/{usuarioGuidRef}")]
     public async Task<IActionResult> ProxyClienteUsuarioGuidRef(string usuarioGuidRef)
     {
         var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/usuario-guid/{usuarioGuidRef}";
+        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
+    }
+
+    [HttpGet("reservas/cliente/{guidCliente:guid}")]
+    public async Task<IActionResult> ProxyReservasPorCliente(
+        Guid guidCliente,
+        [FromQuery] int pagina = 1,
+        [FromQuery] int tamanio = 10)
+    {
+        var targetUrl = $"{_clienteBaseUrl}/api/v1/reservas/cliente/{guidCliente}?pagina={pagina}&tamanio={tamanio}";
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
