@@ -229,6 +229,10 @@
           "destination1": {
             "Address": "https://middlewarebusapi-b4dxgnfkfvbwa9ge.brazilsouth-01.azurewebsites.net"
           }
+        },
+        "Metadata": {
+          "Auth.Required": "true",
+          "Auth.CredentialsKey": "Hospedaje"
         }
       },
       "jose-cluster": {
@@ -236,6 +240,10 @@
           "destination1": {
             "Address": "https://middlewarejd-cnbqcdhyccb2d5du.mexicocentral-01.azurewebsites.net"
           }
+        },
+        "Metadata": {
+          "Auth.Required": "true",
+          "Auth.CredentialsKey": "Hospedaje"
         }
       },
       "kelvin-cluster": {
@@ -243,6 +251,10 @@
           "destination1": {
             "Address": "https://ms-gateway.bluecoast-e7499c30.eastus.azurecontainerapps.io"
           }
+        },
+        "Metadata": {
+          "Auth.Required": "true",
+          "Auth.CredentialsKey": "Hospedaje"
         }
       },
       "juan-cluster": {
@@ -250,6 +262,10 @@
           "destination1": {
             "Address": "https://gateway.orangemeadow-18e2d183.eastus2.azurecontainerapps.io"
           }
+        },
+        "Metadata": {
+          "Auth.Required": "true",
+          "Auth.CredentialsKey": "Hospedaje"
         }
       },
       "mateo-cluster": {
@@ -257,6 +273,10 @@
           "destination1": {
             "Address": "https://hotellux-gateway.onrender.com"
           }
+        },
+        "Metadata": {
+          "Auth.Required": "true",
+          "Auth.CredentialsKey": "Hospedaje"
         }
       }
     }
