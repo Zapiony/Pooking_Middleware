@@ -600,6 +600,13 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
+    [HttpGet("clientes/usuario-guid/{usuarioGuidRef}")]
+    public async Task<IActionResult> ProxyClienteUsuarioGuidRef(string usuarioGuidRef)
+    {
+        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/usuario-guid/{usuarioGuidRef}";
+        return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
+    }
+
     [HttpGet("usuarios/disponibilidad/{username}")]
     public async Task<IActionResult> ProxyUsuariosDisponibilidad(string username)
     {
