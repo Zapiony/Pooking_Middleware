@@ -42,106 +42,515 @@ public class BookingController : ControllerBase
     [HttpPost("auth/registro")]
     public async Task<IActionResult> Registro([FromBody] CrearUsuarioRequest request)
     {
-        _logger.LogInformation("Gateway: Iniciando Registro Orquestado para {Email}", request.Correo);
-
-        // ── 1. Registrar el usuario en el microservicio de Auth ──
-        var authRequest = new
-        {
-            identificador = request.Identificador,
-            correo = request.Correo,
-            password = request.Password,
-            nombreRol = string.IsNullOrWhiteSpace(request.NombreRol) ? "CLIENTE" : request.NombreRol,
-            creadoPorUsuario = request.Correo
-        };
-
-        var authUrl = $"{_authBaseUrl}/api/v1/auth/registro";
-        var authContent = new StringContent(JsonSerializer.Serialize(authRequest), Encoding.UTF8, "application/json");
-
-        HttpResponseMessage authResponse;
         try
         {
-            authResponse = await _httpClient.PostAsync(authUrl, authContent);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Gateway: Error de conexión con microservicio de Auth.");
-            return StatusCode(503, ApiErrorResponse.Crear("El servicio de Auth no está disponible temporalmente.", 503));
-        }
+            Response.Headers["X-Booking-Registro-Handler"] = "BookingController.Registro";
+            _logger.LogInformation("DIAGNOSTICO Registro: entrando a BookingController.Registro para POST /api/v2/booking/auth/registro.");
+            _logger.LogInformation("Gateway: Iniciando Registro Orquestado para {Email}", request.Correo);
 
-        var authResponseBody = await authResponse.Content.ReadAsStringAsync();
-        if (!authResponse.IsSuccessStatusCode)
-        {
-            _logger.LogWarning("Gateway: Registro de usuario en Auth falló con estado {Status}. Body: {Body}", authResponse.StatusCode, authResponseBody);
-            return StatusCode((int)authResponse.StatusCode, JsonSerializer.Deserialize<JsonElement>(authResponseBody));
-        }
-
-        // Parsear respuesta para obtener usuarioGuid
-        Guid usuarioGuid = Guid.Empty;
-        JsonElement authJson = default;
-        try
-        {
-            authJson = JsonSerializer.Deserialize<JsonElement>(authResponseBody);
-            if (authJson.TryGetProperty("data", out var dataProp) && dataProp.TryGetProperty("usuarioGuid", out var guidProp))
+            _logger.LogInformation("Registro: antes de validar identificador.");
+            _logger.LogInformation("Registro: antes de validar correo.");
+            var validacionPrevia = await ValidarDisponibilidadRegistroAsync(request);
+            _logger.LogInformation("Registro: después de validar identificador y correo. Resultado={TieneError}", validacionPrevia != null);
+            if (validacionPrevia != null)
             {
-                Guid.TryParse(guidProp.GetString(), out usuarioGuid);
+                return validacionPrevia;
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Gateway: Error al deserializar la respuesta de registro de Auth.");
-        }
 
-        if (usuarioGuid == Guid.Empty)
-        {
-            _logger.LogError("Gateway: No se pudo obtener el usuarioGuid desde la respuesta del microservicio de Auth.");
-            return StatusCode(500, ApiErrorResponse.Crear("Error interno al procesar el usuario creado.", 500));
-        }
-
-        _logger.LogInformation("Gateway: Usuario creado exitosamente con GUID: {Guid}", usuarioGuid);
-
-        // ── 2. Registrar los datos del cliente en el microservicio de Cliente ──
-        if (request.TieneClienteData)
-        {
-            var clienteRequest = new
+            // ── 1. Registrar el usuario en el microservicio de Auth ──
+            var authRequest = new
             {
-                usuarioGuidRef = usuarioGuid,
-                nombres = request.Nombres,
-                apellidos = request.Apellidos,
-                razonSocial = request.RazonSocial,
-                tipoIdentificacion = request.TipoIdentificacion,
-                numeroIdentificacion = request.NumeroIdentificacion,
+                username = request.Identificador,
                 correo = request.Correo,
-                telefono = request.Telefono,
-                direccion = request.Direccion
+                password = request.Password,
+                nombreRol = string.IsNullOrWhiteSpace(request.NombreRol) ? "CLIENTE" : request.NombreRol,
+                creadoPorUsuario = request.Correo
             };
 
-            var clienteUrl = $"{_clienteBaseUrl}/api/v1/clientes";
-            var clienteContent = new StringContent(JsonSerializer.Serialize(clienteRequest), Encoding.UTF8, "application/json");
+            var authUrl = $"{_authBaseUrl}/api/v1/auth/registro";
+            var authContent = new StringContent(JsonSerializer.Serialize(authRequest), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage clienteResponse;
+            HttpResponseMessage authResponse;
             try
             {
-                _logger.LogInformation("Gateway: Enviando perfil de cliente a {Url}", clienteUrl);
-                clienteResponse = await _httpClient.PostAsync(clienteUrl, clienteContent);
+                _logger.LogInformation("Registro: antes de llamar Auth. Url={Url}", authUrl);
+                authResponse = await _httpClient.PostAsync(authUrl, authContent);
+                _logger.LogInformation("Registro: después de llamar Auth. Status={Status}", authResponse.StatusCode);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gateway: Error de conexión con microservicio de Cliente.");
-                return StatusCode(503, ApiErrorResponse.Crear("Usuario creado, pero no se pudo registrar la información del cliente.", 503));
+                _logger.LogError(ex, "Gateway: Error de conexión con microservicio de Auth.");
+                return StatusCode(503, ApiErrorResponse.Crear("El servicio de Auth no está disponible temporalmente.", 503));
             }
 
-            var clienteResponseBody = await clienteResponse.Content.ReadAsStringAsync();
-            if (!clienteResponse.IsSuccessStatusCode)
+            var authResponseBody = await authResponse.Content.ReadAsStringAsync();
+            var authStatusCode = (int)authResponse.StatusCode;
+            _logger.LogInformation("DIAGNOSTICO Registro: AuthStatusCode={AuthStatusCode}. AuthResponseBody={AuthResponseBody}", authStatusCode, authResponseBody);
+            if (!authResponse.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Gateway: Registro de perfil en Cliente falló con estado {Status}. Body: {Body}", clienteResponse.StatusCode, clienteResponseBody);
-                return StatusCode((int)clienteResponse.StatusCode, JsonSerializer.Deserialize<JsonElement>(clienteResponseBody));
+                _logger.LogWarning("Gateway: Registro de usuario en Auth falló con estado {Status}. Body: {Body}", authResponse.StatusCode, authResponseBody);
+                return CrearErrorServicioExterno(authResponse, authResponseBody, "Auth", "No se pudo registrar el usuario en Auth.");
             }
 
-            _logger.LogInformation("Gateway: Perfil de cliente creado exitosamente.");
+            // Parsear respuesta para obtener usuarioGuid
+            Guid usuarioGuid = Guid.Empty;
+            JsonElement authJson = default;
+            try
+            {
+                _logger.LogInformation("Registro: antes de leer usuarioGuid desde respuesta Auth.");
+                _logger.LogInformation("Registro: body exitoso de Auth: {Body}", authResponseBody);
+                authJson = JsonSerializer.Deserialize<JsonElement>(authResponseBody);
+                TryObtenerUsuarioGuidAuth(authJson, out usuarioGuid);
+                _logger.LogInformation("Registro: después de leer usuarioGuid. UsuarioGuid={UsuarioGuid}", usuarioGuid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Gateway: Error al deserializar la respuesta de registro de Auth.");
+            }
+
+            if (usuarioGuid == Guid.Empty)
+            {
+                _logger.LogError("Gateway: No se pudo obtener el usuarioGuid desde la respuesta del microservicio de Auth. Body: {Body}", authResponseBody);
+                var env = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+                if (env.IsDevelopment())
+                {
+                    return StatusCode(502, new
+                    {
+                        message = "Auth creó el usuario, pero no devolvió el identificador necesario para crear el cliente.",
+                        handler = "BookingController.Registro",
+                        route = "POST /api/v2/booking/auth/registro",
+                        authStatusCode,
+                        authResponseBody,
+                        camposDetectados = ObtenerCamposJson(authResponseBody)
+                    });
+                }
+
+                return StatusCode(502, ApiErrorResponse.Crear("Auth creó el usuario, pero no devolvió el identificador necesario para crear el cliente.", 502));
+            }
+
+            _logger.LogInformation("Gateway: Usuario creado exitosamente con GUID: {Guid}", usuarioGuid);
+
+            // ── 2. Registrar los datos del cliente en el microservicio de Cliente ──
+            if (request.TieneClienteData)
+            {
+                var clienteRequest = new
+                {
+                    usuarioGuidRef = usuarioGuid,
+                    nombres = request.Nombres,
+                    apellidos = request.Apellidos,
+                    razonSocial = request.RazonSocial,
+                    tipoIdentificacion = request.TipoIdentificacion,
+                    numeroIdentificacion = request.NumeroIdentificacion,
+                    correo = request.Correo,
+                    telefono = request.Telefono,
+                    direccion = request.Direccion
+                };
+
+                var clienteUrl = $"{_clienteBaseUrl}/api/v1/clientes";
+                var clienteRequestJson = JsonSerializer.Serialize(clienteRequest);
+                _logger.LogInformation("DIAGNOSTICO Registro: JSON enviado a Cliente POST /api/v1/clientes: {ClienteRequestJson}", clienteRequestJson);
+                var clienteContent = new StringContent(clienteRequestJson, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage clienteResponse;
+                try
+                {
+                    _logger.LogInformation("Registro: antes de llamar Cliente. Url={Url}", clienteUrl);
+                    clienteResponse = await _httpClient.PostAsync(clienteUrl, clienteContent);
+                    _logger.LogInformation("Registro: después de llamar Cliente. Status={Status}", clienteResponse.StatusCode);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Gateway: Error de conexión con microservicio de Cliente.");
+                    return StatusCode(503, ApiErrorResponse.Crear("Usuario creado, pero no se pudo registrar la información del cliente.", 503));
+                }
+
+                var clienteResponseBody = await clienteResponse.Content.ReadAsStringAsync();
+                if (!clienteResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Gateway: Registro de perfil en Cliente falló con estado {Status}. Body: {Body}", clienteResponse.StatusCode, clienteResponseBody);
+                    return CrearErrorServicioExterno(clienteResponse, clienteResponseBody, "Cliente", "Usuario creado en Auth, pero no se pudo registrar la información del cliente.");
+                }
+
+                _logger.LogInformation("Gateway: Perfil de cliente creado exitosamente.");
+            }
+
+            // Retornar la respuesta original de Auth
+            return Created(string.Empty, authJson);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error real en Registro");
+
+            var env = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            if (env.IsDevelopment())
+            {
+                return StatusCode(500, new
+                {
+                    exceptionType = ex.GetType().FullName,
+                    message = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
+
+            return StatusCode(500, ApiErrorResponse.Crear("Error interno del servidor.", 500));
+        }
+    }
+
+    private async Task<IActionResult?> ValidarDisponibilidadRegistroAsync(CrearUsuarioRequest request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.Identificador))
+        {
+            var usernameUrl = $"{_authBaseUrl}/api/v1/usuarios/disponibilidad/{Uri.EscapeDataString(request.Identificador)}";
+            var resultado = await ValidarDisponibilidadAsync(
+                usernameUrl,
+                "Auth",
+                "identificador",
+                $"El identificador '{request.Identificador}' ya está en uso.");
+
+            if (resultado != null)
+                return resultado;
         }
 
-        // Retornar la respuesta original de Auth
-        return Created(string.Empty, authJson);
+        if (!string.IsNullOrWhiteSpace(request.Correo))
+        {
+            var correoUrl = $"{_authBaseUrl}/api/v1/usuarios/disponibilidad-correo/{Uri.EscapeDataString(request.Correo)}";
+            var resultado = await ValidarDisponibilidadAsync(
+                correoUrl,
+                "Auth",
+                "correo",
+                $"El correo '{request.Correo}' ya está en uso.");
+
+            if (resultado != null)
+                return resultado;
+        }
+
+        return null;
+    }
+
+    private static bool TryObtenerUsuarioGuidAuth(JsonElement authJson, out Guid usuarioGuid)
+    {
+        usuarioGuid = Guid.Empty;
+
+        if (TryObtenerGuidPorRuta(authJson, out usuarioGuid, "data", "usuarioGuid") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "data", "usuario_guid") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "data", "id") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "data", "userId") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "data", "usuario", "id") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "usuarioGuid") ||
+            TryObtenerGuidPorRuta(authJson, out usuarioGuid, "usuario_guid"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static IReadOnlyList<string> ObtenerCamposJson(string responseBody)
+    {
+        if (string.IsNullOrWhiteSpace(responseBody))
+            return ["<body vacío>"];
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+            var campos = new List<string>();
+            AgregarCamposJson(document.RootElement, "$", campos);
+            return campos.Count == 0 ? ["<sin campos JSON detectables>"] : campos;
+        }
+        catch (JsonException ex)
+        {
+            return [$"<JSON inválido: {ex.Message}>"];
+        }
+    }
+
+    private static void AgregarCamposJson(JsonElement element, string path, List<string> campos)
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in element.EnumerateObject())
+            {
+                var propertyPath = path == "$" ? property.Name : $"{path}.{property.Name}";
+                campos.Add(propertyPath);
+                AgregarCamposJson(property.Value, propertyPath, campos);
+            }
+
+            return;
+        }
+
+        if (element.ValueKind == JsonValueKind.Array)
+        {
+            var index = 0;
+            foreach (var item in element.EnumerateArray())
+            {
+                AgregarCamposJson(item, $"{path}[{index}]", campos);
+                index++;
+            }
+        }
+    }
+
+    private static bool TryObtenerGuidPorRuta(JsonElement root, out Guid guid, params string[] path)
+    {
+        guid = Guid.Empty;
+        var current = root;
+
+        foreach (var segment in path)
+        {
+            if (current.ValueKind != JsonValueKind.Object ||
+                !TryGetPropertyIgnoreCase(current, segment, out current))
+            {
+                return false;
+            }
+        }
+
+        return TryConvertirGuid(current, out guid);
+    }
+
+    private static bool TryGetPropertyIgnoreCase(JsonElement element, string propertyName, out JsonElement value)
+    {
+        if (element.TryGetProperty(propertyName, out value))
+            return true;
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+
+    private static bool TryConvertirGuid(JsonElement element, out Guid guid)
+    {
+        guid = Guid.Empty;
+
+        if (element.ValueKind == JsonValueKind.String)
+        {
+            return Guid.TryParse(element.GetString(), out guid);
+        }
+
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            if (TryGetPropertyIgnoreCase(element, "value", out var valueProp) &&
+                TryConvertirGuid(valueProp, out guid))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private async Task<IActionResult?> ValidarDisponibilidadAsync(
+        string url,
+        string servicio,
+        string campo,
+        string mensajeNoDisponible)
+    {
+        HttpResponseMessage response;
+        try
+        {
+            _logger.LogInformation("Gateway: Validando disponibilidad de {Campo} en {Servicio}.", campo, servicio);
+            response = await _httpClient.GetAsync(url);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Gateway: Error de conexión validando disponibilidad de {Campo} en {Servicio}.", campo, servicio);
+            return StatusCode(503, ApiErrorResponse.Crear(
+                $"No se pudo validar la disponibilidad de {campo}. Intente nuevamente.",
+                503));
+        }
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning(
+                "Gateway: Validación de disponibilidad de {Campo} en {Servicio} falló con estado {Status}. Body: {Body}",
+                campo,
+                servicio,
+                response.StatusCode,
+                responseBody);
+
+            return CrearErrorServicioExterno(
+                response,
+                responseBody,
+                servicio,
+                $"No se pudo validar la disponibilidad de {campo}.");
+        }
+
+        if (!TryObtenerDisponibilidad(responseBody, out var disponible))
+        {
+            _logger.LogWarning(
+                "Gateway: Respuesta de disponibilidad de {Campo} en {Servicio} no reconocida. Body: {Body}",
+                campo,
+                servicio,
+                responseBody);
+
+            return StatusCode(502, ApiErrorResponse.Crear(
+                $"No se pudo interpretar la validación de disponibilidad de {campo}.",
+                502));
+        }
+
+        if (!disponible)
+        {
+            return Conflict(ApiErrorResponse.Crear(mensajeNoDisponible, 409));
+        }
+
+        return null;
+    }
+
+    private static bool TryObtenerDisponibilidad(string responseBody, out bool disponible)
+    {
+        disponible = false;
+
+        if (string.IsNullOrWhiteSpace(responseBody))
+            return false;
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+            return TryObtenerDisponibilidad(document.RootElement, out disponible);
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    private static bool TryObtenerDisponibilidad(JsonElement element, out bool disponible)
+    {
+        disponible = false;
+
+        if (element.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            disponible = element.GetBoolean();
+            return true;
+        }
+
+        if (element.ValueKind == JsonValueKind.String)
+        {
+            return TryObtenerDisponibilidadDesdeTexto(element.GetString(), out disponible);
+        }
+
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in element.EnumerateObject())
+            {
+                if (property.Value.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                {
+                    var value = property.Value.GetBoolean();
+                    var name = property.Name.ToLowerInvariant();
+
+                    if (name is "disponible" or "estadodisponible" or "isavailable" or "available" or "esdisponible" or "data" or "result" or "resultado")
+                    {
+                        disponible = value;
+                        return true;
+                    }
+
+                    if (name is "existe" or "exists" or "existeusuario" or "existecliente" or "enuso" or "usado")
+                    {
+                        disponible = !value;
+                        return true;
+                    }
+                }
+
+                if (property.Value.ValueKind == JsonValueKind.String &&
+                    TryObtenerDisponibilidadDesdeTexto(property.Value.GetString(), out disponible))
+                {
+                    return true;
+                }
+
+                if ((property.Value.ValueKind is JsonValueKind.Object or JsonValueKind.Array) &&
+                    TryObtenerDisponibilidad(property.Value, out disponible))
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (element.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in element.EnumerateArray())
+            {
+                if (TryObtenerDisponibilidad(item, out disponible))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryObtenerDisponibilidadDesdeTexto(string? value, out bool disponible)
+    {
+        disponible = false;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var texto = value.Trim().ToLowerInvariant();
+        if (bool.TryParse(texto, out disponible))
+            return true;
+
+        if (texto is "disponible" or "available" or "libre")
+        {
+            disponible = true;
+            return true;
+        }
+
+        if (texto is "no disponible" or "unavailable" or "ocupado" or "en uso" or "existe")
+        {
+            disponible = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    private IActionResult CrearErrorServicioExterno(
+        HttpResponseMessage response,
+        string responseBody,
+        string servicio,
+        string mensajeFallback)
+    {
+        var statusCode = (int)response.StatusCode;
+
+        if (TryParseJsonElement(responseBody, out var json))
+        {
+            return StatusCode(statusCode, json);
+        }
+
+        var errors = string.IsNullOrWhiteSpace(responseBody)
+            ? Array.Empty<string>()
+            : new[] { responseBody };
+
+        _logger.LogWarning(
+            "Gateway: {Servicio} devolvió un error no JSON con estado {Status}.",
+            servicio,
+            response.StatusCode);
+
+        return StatusCode(statusCode, ApiErrorResponse.Crear(mensajeFallback, statusCode, errors));
+    }
+
+    private static bool TryParseJsonElement(string responseBody, out JsonElement json)
+    {
+        json = default;
+
+        if (string.IsNullOrWhiteSpace(responseBody))
+            return false;
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+            json = document.RootElement.Clone();
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     [HttpPost("usuarios/buscar")]
@@ -205,10 +614,10 @@ public class BookingController : ControllerBase
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
-    [HttpGet("clientes/disponibilidad/correo/{correo}")]
-    public async Task<IActionResult> ProxyClientesDisponibilidadCorreo(string correo)
+    [HttpGet("usuarios/disponibilidad-correo/{correo}")]
+    public async Task<IActionResult> ProxyUsuariosDisponibilidadCorreo(string correo)
     {
-        var targetUrl = $"{_clienteBaseUrl}/api/v1/clientes/disponibilidad/correo/{correo}";
+        var targetUrl = $"{_authBaseUrl}/api/v1/usuarios/disponibilidad-correo/{correo}";
         return await ForwardRequest(targetUrl, HttpMethod.Get, null!);
     }
 
