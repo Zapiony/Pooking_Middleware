@@ -1,5 +1,6 @@
 using Booking.Middleware.Api.Extensions;
 using Booking.Middleware.Api.Middleware;
+using Booking.Middleware.Api.Services;
 
 // ── HTTP/2 sin TLS en desarrollo local ───────────────────────────────────────
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -37,8 +38,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks();
 
 // ── YARP Reverse Proxy ────────────────────────────────────────────────────────
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<IExternalAuthTokenProvider, ExternalAuthTokenProvider>();
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .AddTransforms<BearerInjectionTransformProvider>();
 
 // ── Pipeline HTTP ─────────────────────────────────────────────────────────────
 var app = builder.Build();
